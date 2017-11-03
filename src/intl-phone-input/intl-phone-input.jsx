@@ -148,6 +148,10 @@ class IntlPhoneInput extends React.Component {
                 this.input.setSelectionRange(inputValue.length);
             }, 0);
         });
+
+        if (this.props.onChange) {
+            this.props.onChange(inputValue);
+        }
     }
 
     @autobind
@@ -274,6 +278,10 @@ class IntlPhoneInput extends React.Component {
             inputValue: new this.util.asYouType(country.iso2.toUpperCase()).input(inputValue), // eslint-disable-line new-cap
             countryIso2: country.iso2
         });
+
+        // if (this.props.onChange) {
+        //     this.props.onChange(inputValue);
+        // }
     }
 
     /**

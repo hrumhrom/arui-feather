@@ -2,9 +2,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { render, cleanUp } from '../test-utils';
+import { render, cleanUp, simulate } from '../test-utils';
 
-import IntlPhoneInput from './intl-phone-input';
+import IntlPhoneInput from './';
+
+import { SCROLL_TO_CORRECTION } from '../vars';
 
 describe('intl-phone-input', () => {
     let originalWindowScrollTo = window.scrollTo;
@@ -48,13 +50,10 @@ describe('intl-phone-input', () => {
         }, 0);
     });
 
-    it('should scroll window to element on public `scrollTo` method call', (done) => {
+    it('should scroll window to element on public `scrollTo` method', (done) => {
         let elem = render(<IntlPhoneInput />);
         let elemTopPosition = elem.node.getBoundingClientRect().top;
-        let elemScrollTo = elemTopPosition + window.pageYOffset;
-
-        console.log(window);
-        console.log(window.scrollTo);
+        let elemScrollTo = (elemTopPosition + window.pageYOffset) - SCROLL_TO_CORRECTION;
 
         elem.instance.scrollTo();
 
@@ -64,23 +63,34 @@ describe('intl-phone-input', () => {
         }, 0);
     });
 
-    it('should call `onChange` callback after component `value` prop was changed', () => {
-    });
-
     it('should call `onChange` callback after component input was changed', () => {
+        let onChange = sinon.spy();
+        let elem = render(<IntlPhoneInput onChange={ onChange } />);
+        let controlNode = elem.node.querySelector('.input input');
+
+        simulate(controlNode, 'change');
+
+        expect(onChange).to.have.been.calledTwice; // TODO @teryaew: rewrite handleSelectChange
     });
 
     it('should call `onChange` callback after component select was changed', () => {
+        let onChange = sinon.spy();
+
+        render(<IntlPhoneInput onChange={ onChange } />);
+
+        let popupNode = document.querySelector('.popup');
+        let firstOptionNode = popupNode.querySelector('.menu-item');
+
+        firstOptionNode.click();
+
+        expect(onChange).to.have.been.calledOnce;
     });
 
-    it('should load formatting util', () => {
-    });
-
-    it('should have default country flag icon', () => {
-        let elem = render(<IntlPhoneInput />);
-        expect(elem.node.querySelector('.flag-icon')).to.have.class('flag-icon_country_ru');
-    });
-
-    it('should set new country flag icon from props', () => {
-    });
+    // it('should have default country flag icon', () => {
+    //     let elem = render(<IntlPhoneInput />);
+    //     expect(elem.node.querySelector('.flag-icon')).to.have.class('flag-icon_country_ru');
+    // });
+    //
+    // it('should set new country flag icon from props', () => {
+    // });
 });
